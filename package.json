@@ -7,6 +7,7 @@
     "dev": "slidev --open",
     "export": "slidev export"
   },
+  "packageManager": "pnpm@9.9.0",
   "dependencies": {
     "@slidev/cli": "^0.50.0-beta.3",
     "@slidev/theme-default": "latest",
