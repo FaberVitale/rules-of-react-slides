@@ -2,10 +2,8 @@
 # You can also start simply with 'default'
 theme: default
 info: |
-  ## Slidev Starter Template
-  Presentation slides for developers.
-
-  Learn more at [Sli.dev](https://sli.dev)
+  ## Rules of react slides
+  See also https://react.dev/reference/react#rules-of-react
 # apply unocss classes to the current slide
 class: text-center
 # https://sli.dev/features/drawing
@@ -20,7 +18,23 @@ overviewSnapshots: true
 title: 'Rules of react'
 ---
 
-# Rules of react <img class="inline-block relative -top-1" width="64" height="64" alt="react logo" src="/media/react-logo-dark.svg">
+<style>
+  @keyframes rotate {
+    from {
+      rotate: 0deg;
+    }
+
+    to {
+      rotate: 360deg
+    }
+  }
+
+  .spin-anim {
+    animation: 4s linear infinite running rotate;
+  }
+</style>
+
+# Rules of react <img class="inline-block relative -top-1 spin-anim" width="64" height="64" alt="react logo" src="/media/react-logo-dark.svg">
 
 <div class="fixed bottom-2 right-2">
 <h2>Author: Fabrizio A. Vitale</h2>
@@ -65,7 +79,7 @@ layout: intro
 layout: intro
 ---
 
-<h1>Rule #1 <br><v-click>React components are <strong>pure</strong> 😇</v-click></h1>
+<h1>Rule #1 <br><v-click>React components and hooks are <strong>pure</strong> 😇</v-click></h1>
 
 ---
 layout: center
@@ -75,6 +89,7 @@ layout: center
 
 <a class="text-3xl" href="https://react.dev/reference/rules/components-and-hooks-must-be-pure#side-effects-must-run-outside-of-render">A component performs side effects outside the render</a>
 
+<p>Effects are confined to listeners ad useEffect</p>
 
 ---
 layout: center
@@ -158,3 +173,100 @@ export function Clock() {
   );
 }
 ```
+
+---
+layout: center
+---
+
+# Purity - part 3
+
+<a class="text-3xl" href="https://react.dev/reference/rules/components-and-hooks-must-be-pure#mutation">React components and hooks do not mutate non-local values</a>
+---
+layout: center
+---
+
+# Local mutation 👍
+
+```tsx
+function FriendList({ friends }) {
+  const items = []; // ✅ Good: locally created
+  for (let i = 0; i < friends.length; i++) {
+    const friend = friends[i];
+    items.push(
+      <Friend key={friend.id} friend={friend} />
+    ); // ✅ Good: local mutation is okay
+  }
+  return <section>{items}</section>;
+}
+```
+
+---
+layout: center
+---
+
+# Mutation of external dependencies 👎
+
+```tsx
+const items = []; // not local
+
+function FriendList({ friends }) {
+  for (let i = 0; i < friends.length; i++) {
+    const friend = friends[i];
+    items.push(
+      <Friend key={friend.id} friend={friend} />
+    ); // 👎 mutation of external values
+  }
+  return <section>{items}</section>;
+}
+```
+
+---
+layout: intro
+---
+
+# So...why component's and hooks's purity matters?
+
+---
+layout: center
+---
+
+# React relies on [referential transparency](https://stackoverflow.com/a/210869) in its internal implementation.
+
+---
+layout: center
+---
+
+<h1>Several internal optimizations and <a href="https://www.linkedin.com/pulse/understanding-react-re-rendering-overview-shallow-examples-pandey">heuristics</a> are based on this contract</h1>
+
+---
+layout: center
+---
+
+<h1>Public apis, such as <a href="https://react.dev/reference/react/memo">memo</a>, works correctly if the purity is upheld.</h1>
+
+---
+layout: center
+---
+
+<h1><a href="https://react.dev/learn/react-compiler">react compiler</a> works only if components are pure.</h1>
+
+---
+layout: intro
+---
+
+# Uhm... seems important 🧐
+
+## How can we detect if components are not pure?
+
+
+---
+layout: center
+---
+
+# We can use enable [strict mode](https://react.dev/reference/react/StrictMode#fixing-bugs-found-by-double-rendering-in-development) to detect components that are not pure.
+
+---
+layout: center
+---
+
+# In strict mode, components are [rendered twice](https://react.dev/reference/react/StrictMode#fixing-bugs-found-by-double-rendering-in-development), helping us detecting impure components
