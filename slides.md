@@ -89,7 +89,7 @@ layout: center
 
 <a class="text-3xl" href="https://react.dev/reference/rules/components-and-hooks-must-be-pure#side-effects-must-run-outside-of-render">A component performs side effects outside the render</a>
 
-<p>Effects are confined to listeners ad useEffect</p>
+<p>side effects are confined to listeners and <code>/use(Layout|Insertion)?Effect/</code> </p>
 
 ---
 layout: center
@@ -142,13 +142,6 @@ layout: center
 # Purity - part 2
 
 <a class="text-3xl" href="https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent">Components must be idempotent</a>
-
----
-layout: center
----
-
-# Idempotent meaning:
-<span class="text-3xl">Components must <strong>always return</strong> the same output with respect to their dependencies – props, state, and context.</span>
 
 ---
 layout: center
@@ -230,25 +223,27 @@ layout: intro
 layout: center
 ---
 
-# React relies on [referential transparency](https://stackoverflow.com/a/210869) in its internal implementation.
+<h1>because public apis, such as <a href="https://react.dev/reference/react/memo">memo</a>, works correctly only if the purity is upheld.</h1>
+
 
 ---
 layout: center
 ---
 
-<h1>Several internal optimizations and <a href="https://www.linkedin.com/pulse/understanding-react-re-rendering-overview-shallow-examples-pandey">heuristics</a> are based on this contract</h1>
+<h1>because the ssr implementation is based on the idea that server and client must return the same output.</h1>
 
 ---
 layout: center
 ---
 
-<h1>Public apis, such as <a href="https://react.dev/reference/react/memo">memo</a>, works correctly if the purity is upheld.</h1>
+<h1>because several internal optimizations and <a href="https://www.linkedin.com/pulse/understanding-react-re-rendering-overview-shallow-examples-pandey">heuristics</a> are based on this contract</h1>
+
 
 ---
 layout: center
 ---
 
-<h1><a href="https://react.dev/learn/react-compiler">react compiler</a> works only if components are pure.</h1>
+<h1>because <a href="https://react.dev/learn/react-compiler">react compiler</a> works only if components are pure.</h1>
 
 ---
 layout: intro
@@ -270,3 +265,151 @@ layout: center
 ---
 
 # In strict mode, components are [rendered twice](https://react.dev/reference/react/StrictMode#fixing-bugs-found-by-double-rendering-in-development), helping us detecting impure components
+
+---
+layout: intro
+---
+
+<h1>Rule #2 <br><v-click>Rules of hooks 🪝</v-click></h1>
+
+---
+layout: intro
+---
+
+<h1>Rule #2 - part 1</h1>
+<v-click>
+<a class="text-3xl" href="https://react.dev/reference/rules/rules-of-hooks#only-call-hooks-at-the-top-level">Only call Hooks at the top level</a>
+</v-click>
+
+---
+layout: intro
+---
+
+<h1>Rule #2 - part 2</h1>
+<v-click>
+<a class="text-3xl" href="https://react.dev/reference/rules/rules-of-hooks#only-call-hooks-from-react-functions">Only call Hooks from React functions (components, hooks)</a>
+</v-click>
+
+---
+layout: intro
+---
+
+# So...why should we respect them?
+
+---
+layout: intro
+---
+
+# Breaking the rules of hooks will cause crashes at runtime
+
+```tsx
+function User(props) {
+  let user = props.lastname;
+  if(props.prefix) { // BAD 👎 causes crash at runtime
+    user = useMemo(() => `${prefix}${lastname}`, [prefix, lastname]);
+  }
+
+  return <p>{user}</p>
+}
+```
+
+---
+layout: intro
+---
+
+# Ok, it seems important: <br> how can we detect these issues?
+
+---
+layout: intro
+---
+
+# [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks) <br> to the rescue 🛟!
+
+
+---
+layout: intro
+---
+
+<h1>Rule #3 <br><v-click>(only) React calls components and hooks directly</v-click></h1>
+
+
+---
+layout: intro
+---
+
+<h1>Rule #3 - part 1</h1>
+<v-click>
+<a class="text-3xl" href="https://react.dev/reference/rules/react-calls-components-and-hooks#never-call-component-functions-directly">Never call component functions directly</a>
+</v-click>
+
+
+---
+layout: center
+---
+
+# Components should only be used in JSX. <br> Don’t call them as regular functions.
+
+```tsx
+function Article() {
+  return <article><h2>hi pal!</h2></article>
+}
+
+function BlogPost() {
+  return <Layout>{Article()}</Layout>; // Bad 👎! Never call them directly
+}
+```
+
+---
+layout: intro
+---
+
+<h1>Rule #3 - part 2</h1>
+<v-click>
+<a class="text-3xl" href="https://react.dev/reference/rules/react-calls-components-and-hooks#never-pass-around-hooks-as-regular-values">Never pass around Hooks as regular values</a>
+</v-click>
+
+
+---
+layout: center
+---
+
+# Hooks should be as “static” as possible.
+
+```tsx
+function User(props) {
+  const useUser = withAuth(props); // Bad 👎 Do not use higher order hooks!
+  const user = useUser();
+}
+```
+
+---
+layout: center
+---
+
+# [Rule #3 breaches lead to crashes at runtime](https://stackblitz.com/edit/vitejs-vite-yv7xpb?file=src%2FApp.tsx&terminal=dev)
+
+```jsx
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount((count) => count + 1)}>
+      count is {count}
+    </button>
+  );
+}
+
+function App() {
+  const [hasCounter, setHasCounter] = useState(true);
+  const toggleHasCounter = () => setHasCounter((val) => !val);
+  return (
+    <>
+      <h1>How to crash a react app accidentally</h1>
+      {hasCounter && Counter() /* BAD 👎 causes a crash at runtime */}
+      <button type="button" onClick={toggleHasCounter}>
+        toggle counter
+      </button>
+    </>
+  );
+}
+```
