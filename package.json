@@ -2,6 +2,7 @@
   "name": "rules-of-react",
   "type": "module",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "build": "slidev build",
     "dev": "slidev --open",
