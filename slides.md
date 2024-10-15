@@ -16,6 +16,7 @@ mdc: true
 # take snapshot for each slide in the overview
 overviewSnapshots: true
 title: 'Rules of react'
+colorSchema: dark
 ---
 
 <style>
