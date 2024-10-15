@@ -63,17 +63,34 @@ layout: intro
 ---
 
 
-<h1 class="relative"><strong class="absolute -top-16 right-54" style="rotate: -20deg;">RULES</strong> They are a set of <s>guidelines</s> that makes us write good quality and <strong>bug-free</strong> react components</h1>
+<h1 class="relative"><strong class="absolute -top-16 right-54" style="rotate: -20deg;">RULES</strong> They are a set of <s style="text-decoration-color: red;">guidelines</s> that makes us write good quality and <strong>bug-free</strong> react components</h1>
 
 ---
 layout: intro
 ---
 
-# Why we called them rules?
+# Why do they matter?
+
+<v-click>
 
 ## Because breaches of those rules will lead to buggy and non determinstic applications
 
 <span class="text-8xl fixed bottom-2 right-2">🐛</span>
+
+</v-click>
+
+---
+layout: intro
+---
+
+# Why are they important?
+
+<v-click>
+
+## Because [react compiler](https://react.dev/learn/react-compiler) works only on components that abide by them.
+
+<span class="text-8xl fixed bottom-2 right-2">⚙️</span>
+</v-click>
 
 ---
 layout: intro
@@ -88,8 +105,9 @@ layout: center
 # Purity - part 1
 
 <a class="text-3xl" href="https://react.dev/reference/rules/components-and-hooks-must-be-pure#side-effects-must-run-outside-of-render">A component performs side effects outside the render</a>
-
+<v-click>
 <p>side effects are confined to listeners and <code>/use(Layout|Insertion)?Effect/</code> </p>
+</v-click>
 
 ---
 layout: center
@@ -238,13 +256,6 @@ layout: center
 
 <h1>because several internal optimizations and <a href="https://www.linkedin.com/pulse/understanding-react-re-rendering-overview-shallow-examples-pandey">heuristics</a> are based on this contract</h1>
 
-
----
-layout: center
----
-
-<h1>because <a href="https://react.dev/learn/react-compiler">react compiler</a> works only if components are pure.</h1>
-
 ---
 layout: intro
 ---
@@ -278,7 +289,7 @@ layout: intro
 
 <h1>Rule #2 - part 1</h1>
 <v-click>
-<a class="text-3xl" href="https://react.dev/reference/rules/rules-of-hooks#only-call-hooks-at-the-top-level">Only call Hooks at the top level</a>
+<a class="text-3xl" href="https://react.dev/reference/rules/rules-of-hooks#only-call-hooks-at-the-top-level">Only call Hooks at the top level 📣</a>
 </v-click>
 
 ---
@@ -297,21 +308,23 @@ layout: intro
 # So...why should we respect them?
 
 ---
-layout: intro
+layout: center
 ---
 
 # Breaking the rules of hooks will cause crashes at runtime
 
 ```tsx
 function User(props) {
-  let user = props.lastname;
-  if(props.prefix) { // BAD 👎 causes crash at runtime
-    user = useMemo(() => `${prefix}${lastname}`, [prefix, lastname]);
+  const [color] = useState('blue');
+  let user = lastname;
+  if (prefix) {
+    user = useState(() => `${prefix}${lastname}`); // BAD 👎 causes crash at runtime
   }
-
-  return <p>{user}</p>
+  return <p style={{ color }}>Hello {user}!</p>;
 }
 ```
+
+[online editor](https://stackblitz.com/edit/vitejs-vite-d2cval?file=src%2FApp.tsx,package.json)
 
 ---
 layout: intro
@@ -386,7 +399,7 @@ function User(props) {
 layout: center
 ---
 
-# [Rule #3 breaches lead to crashes at runtime](https://stackblitz.com/edit/vitejs-vite-yv7xpb?file=src%2FApp.tsx&terminal=dev)
+# Rule #3 breaches lead to crashes at runtime
 
 ```jsx
 function Counter() {
@@ -398,13 +411,11 @@ function Counter() {
     </button>
   );
 }
-
 function App() {
   const [hasCounter, setHasCounter] = useState(true);
   const toggleHasCounter = () => setHasCounter((val) => !val);
   return (
     <>
-      <h1>How to crash a react app accidentally</h1>
       {hasCounter && Counter() /* BAD 👎 causes a crash at runtime */}
       <button type="button" onClick={toggleHasCounter}>
         toggle counter
@@ -413,3 +424,26 @@ function App() {
   );
 }
 ```
+
+[online editor](https://stackblitz.com/edit/vitejs-vite-yv7xpb?file=src%2FApp.tsx&terminal=dev)
+
+
+---
+layout: intro
+---
+
+# These are the primary rules we need to follow
+
+<span class="text-8xl fixed bottom-2 right-2">🫡</span>
+
+---
+layout: intro
+---
+
+# Other rules can be found at the [rules of react docs](https://react.dev/reference/rules)&nbsp;<img class="inline-block" width="64" height="64" alt="react logo" src="/media/react-logo-dark.svg">
+
+---
+layout: center
+---
+
+# Thanks for watching! 🙏
